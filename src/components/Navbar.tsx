@@ -1,12 +1,10 @@
 import React from 'react';
-import { Database, Server, Play, HelpCircle } from 'lucide-react';
+import { Database, Play } from 'lucide-react';
 
 interface NavbarProps {
   currentTab: string;
   onSelectTab: (tab: string) => void;
-  onOpenBackendModal: () => void;
   onOpenSchemaModal: () => void;
-  useRemoteBackend: boolean;
   onExecuteQuery: () => void;
   isCompiling: boolean;
 }
@@ -14,9 +12,7 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({
   currentTab,
   onSelectTab,
-  onOpenBackendModal,
   onOpenSchemaModal,
-  useRemoteBackend,
   onExecuteQuery,
   isCompiling
 }) => {
@@ -37,7 +33,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </button>
 
-        {/* Zone 2: 4-5 clean single-line text navigation links */}
+        {/* Zone 2: Clean single-line text navigation links */}
         <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-slate-400">
           <button
             onClick={() => onSelectTab('overview')}
@@ -61,26 +57,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             Relational Catalog
           </button>
-          <button
-            onClick={onOpenBackendModal}
-            className="hover:text-slate-200 transition-colors whitespace-nowrap shrink-0 flex items-center gap-1.5"
-          >
-            <Server size={13} className={useRemoteBackend ? 'text-indigo-400' : 'text-slate-500'} />
-            <span>Flask Backend</span>
-          </button>
         </nav>
 
         {/* Zone 3: 1 primary action */}
         <div className="flex items-center gap-3 shrink-0">
-          <button
-            onClick={onOpenBackendModal}
-            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-mono rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white transition-colors"
-            title="Configure Compiler Engine"
-          >
-            <span className={`w-1.5 h-1.5 rounded-full ${useRemoteBackend ? 'bg-indigo-400' : 'bg-cyan-400'}`} />
-            <span>{useRemoteBackend ? 'Flask API' : 'Simulator'}</span>
-          </button>
-
           <button
             onClick={onExecuteQuery}
             disabled={isCompiling}

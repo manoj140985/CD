@@ -15,7 +15,6 @@ interface SidebarProps {
   currentTab: string;
   onSelectTab: (tab: string) => void;
   onOpenSchemaModal: () => void;
-  onOpenBackendModal: () => void;
   onLoadPreset: (sql: string) => void;
 }
 
@@ -23,7 +22,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   currentTab,
   onSelectTab,
   onOpenSchemaModal,
-  onOpenBackendModal,
   onLoadPreset
 }) => {
   return (
@@ -64,14 +62,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         >
           <Database size={15} className="text-slate-500" />
           <span>Catalog Schema</span>
-        </button>
-
-        <button
-          onClick={onOpenBackendModal}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 transition-colors"
-        >
-          <Server size={15} className="text-slate-500" />
-          <span>Python Flask Backend</span>
         </button>
       </div>
 

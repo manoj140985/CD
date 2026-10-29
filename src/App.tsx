@@ -14,8 +14,7 @@ import { OptimizationPhase } from './components/phases/OptimizationPhase';
 import { ExecutionPlanPhase } from './components/phases/ExecutionPlanPhase';
 import { OverviewView } from './components/OverviewView';
 import { SchemaModal } from './components/SchemaModal';
-import { BackendModal } from './components/BackendModal';
-import { AlertCircle, RefreshCw, ServerOff } from 'lucide-react';
+import { AlertCircle, RefreshCw } from 'lucide-react';
 
 export default function App() {
   const [sql, setSql] = useState<string>(SAMPLE_QUERIES[0].sql);
@@ -26,13 +25,8 @@ export default function App() {
   const [isCompiling, setIsCompiling] = useState<boolean>(false);
   const [compilerError, setCompilerError] = useState<string | null>(null);
 
-  // Backend options
-  const [backendUrl, setBackendUrl] = useState<string>('http://localhost:5000');
-  const [useRemoteBackend, setUseRemoteBackend] = useState<boolean>(false);
-
-  // Modals
+  // Schema Modal state
   const [isSchemaModalOpen, setIsSchemaModalOpen] = useState<boolean>(false);
-  const [isBackendModalOpen, setIsBackendModalOpen] = useState<boolean>(false);
 
   // Core compilation handler
   const handleExecute = useCallback(async (queryToRun?: string) => {
@@ -43,10 +37,7 @@ export default function App() {
     setCompilerError(null);
 
     try {
-      const res = await compileSQL(query, catalog, {
-        useRemoteBackend,
-        backendUrl
-      });
+      const res = await compileSQL(query, catalog);
       setCompilerResult(res);
     } catch (err: any) {
       console.error('Compilation failed:', err);
@@ -54,7 +45,7 @@ export default function App() {
     } finally {
       setIsCompiling(false);
     }
-  }, [sql, catalog, useRemoteBackend, backendUrl]);
+  }, [sql, catalog]);
 
   // Initial compile on mount
   useEffect(() => {
@@ -72,9 +63,7 @@ export default function App() {
       <Navbar
         currentTab={currentTab}
         onSelectTab={setCurrentTab}
-        onOpenBackendModal={() => setIsBackendModalOpen(true)}
         onOpenSchemaModal={() => setIsSchemaModalOpen(true)}
-        useRemoteBackend={useRemoteBackend}
         onExecuteQuery={() => handleExecute()}
         isCompiling={isCompiling}
       />
@@ -86,34 +75,19 @@ export default function App() {
           currentTab={currentTab}
           onSelectTab={setCurrentTab}
           onOpenSchemaModal={() => setIsSchemaModalOpen(true)}
-          onOpenBackendModal={() => setIsBackendModalOpen(true)}
           onLoadPreset={handleLoadPreset}
         />
 
         {/* Content Viewport */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
-          {/* Error Banner if remote call failed */}
+          {/* Error Banner if compilation failed */}
           {compilerError && (
-            <div className="mb-5 p-4 rounded-xl border border-rose-500/50 bg-rose-950/30 text-rose-200 text-xs flex items-start justify-between gap-3 animate-in fade-in">
-              <div className="flex items-start gap-2.5">
-                <ServerOff size={18} className="text-rose-400 shrink-0 mt-0.5" />
-                <div className="space-y-1">
-                  <div className="font-bold text-rose-100">Compiler Execution Error</div>
-                  <div className="font-mono text-[11px] text-rose-300 leading-relaxed">{compilerError}</div>
-                </div>
+            <div className="mb-5 p-4 rounded-xl border border-rose-500/50 bg-rose-950/30 text-rose-200 text-xs flex items-start gap-2.5 animate-in fade-in">
+              <AlertCircle size={18} className="text-rose-400 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <div className="font-bold text-rose-100">Compiler Execution Error</div>
+                <div className="font-mono text-[11px] text-rose-300 leading-relaxed">{compilerError}</div>
               </div>
-
-              {useRemoteBackend && (
-                <button
-                  onClick={() => {
-                    setUseRemoteBackend(false);
-                    handleExecute();
-                  }}
-                  className="px-3 py-1.5 rounded-lg bg-rose-900/60 hover:bg-rose-800 text-rose-100 font-semibold text-xs transition-colors shrink-0"
-                >
-                  Switch to Simulation Engine
-                </button>
-              )}
             </div>
           )}
 
@@ -190,16 +164,6 @@ export default function App() {
         isOpen={isSchemaModalOpen}
         onClose={() => setIsSchemaModalOpen(false)}
         catalog={catalog}
-      />
-
-      {/* Backend Setup Modal */}
-      <BackendModal
-        isOpen={isBackendModalOpen}
-        onClose={() => setIsBackendModalOpen(false)}
-        backendUrl={backendUrl}
-        onUpdateBackendUrl={setBackendUrl}
-        useRemoteBackend={useRemoteBackend}
-        onToggleRemoteBackend={setUseRemoteBackend}
       />
     </div>
   );
